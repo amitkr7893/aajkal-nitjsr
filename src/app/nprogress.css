@@ -1,0 +1,22 @@
+/* Container */
+#nprogress {
+  pointer-events: none;
+}
+
+/* Bar styling */
+#nprogress .bar {
+  height: 4px;
+  position: fixed;
+  z-index: 1031;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  background: linear-gradient(90deg, #05a5e9, #005927);
+}
+
+/* Spinner (optional) */
+#nprogress .spinner {
+  /* display: none; Hide the spinner */
+}
+
+/* You can also animate or customize it further */
