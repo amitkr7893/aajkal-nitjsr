@@ -6,12 +6,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-// function getCookie(name) {
-//   const value = `; ${document.cookie}`;
-//   const parts = value.split(`; ${name}=`);
-//   if (parts.length === 2) return parts.pop().split(';').shift();
-// }
-
 function getCookie(name) {
   if (typeof document === 'undefined') return null; // SSR safety check
   const value = `; ${document.cookie}`;

@@ -56,19 +56,19 @@ export default function ImageCarousel({ events }) {
         <span>
 
           <span className="bg-pink-900/20 m-1 w-max text-pink-300 text-xs font-medium px-2 py-0.5 rounded-sm">
-            {events[index]?.date ? new Date(events[index].date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric'}) : '00/06/2055, 12:00 PM'} 
+            {events[index]?.date ? new Date(events[index].date).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric'}) : '00/00/0000'} 
           </span>
           <span className=" bg-yellow-900/20 m-1 w-max text-yellow-300 text-xs font-medium px-2 py-0.5 rounded-sm">
-            {events[index]?.date ? new Date(events[index].date).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true}) : '00/06/2055, 12:00 PM'} 
+            {events[index]?.date ? new Date(events[index].date).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true}) : '00:00 XY'} 
           </span>
 
         </span>
 
           <span className="bg-green-900/20 m-1 w-max text-green-300 text-xs font-medium px-2 py-0.5 rounded-sm">
-            {'Venue : ' + events[index]?.location || 'XYZ'}
+            {events[index]?.location? 'Venue : ' + events[index]?.location : 'Venue : ABC'}
           </span>
           <span className="bg-sky-900/20 m-1 mt-4 w-max text-sky-300 text-1xl font-bold px-2 py-0.5 rounded-sm">
-            By : {events[index]?.organizer || 'Team XYZ'}
+            By : {events[index]?.organizer? events[index]?.organizer : 'Team XYZ'}
           </span>
 
           <span className="bg-grey-900/20 m-1 mt-4 max-w-[20vw] text-gray-400 text-sm px-2 py-0.5 rounded-sm indent-6 line-clamp-5">

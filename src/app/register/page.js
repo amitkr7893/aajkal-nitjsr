@@ -54,7 +54,7 @@ export default function Register() {
   
     if (res.ok) {
       alert(`${name}, you are registered successfully !`);
-      router.push("/");
+      router.push("/login");
 
     } else {
       const data = await res.json();

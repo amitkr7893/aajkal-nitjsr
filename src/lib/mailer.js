@@ -10,6 +10,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOTPEmail = async (email, otp) => {
+
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
@@ -17,6 +19,10 @@ export const sendOTPEmail = async (email, otp) => {
     text: `Your OTP is: ${otp}. It is valid for 5 minutes.`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try{
+      await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Email sending failed:');
+  }
 };
 
