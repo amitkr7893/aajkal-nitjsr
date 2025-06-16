@@ -12,9 +12,14 @@ const EventCard = ({ events = [] }) => {
         const date = new Date(event.date);
         const dateStr = date.toLocaleDateString('en-GB',{ day: '2-digit', month: '2-digit', year: 'numeric'});
         const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+        const isPast = date < new Date();
         return (
-          <div key={i} className="bg-black p-5 rounded-xl shadow-lg mb-6 mx-4">
+          <div
+            key={i}
+            className={`bg-black p-5 rounded-xl shadow-lg mb-6 mx-4 transition-opacity duration-300 ${
+              isPast ? 'opacity-70 grayscale' : ''
+            }`}
+          >
             <h3 className="text-xl font-semibold text-white mb-2">{event.title}</h3>
 
             {/* Badges for metadata */}
@@ -28,7 +33,7 @@ const EventCard = ({ events = [] }) => {
               <span className="bg-green-900/20 text-green-300 text-xs font-medium px-2 py-0.5 rounded-sm">
                 {event.location}
               </span>
-              <span className="bg-sky-900/20 text-sky-300 text-xs font-bold px-4 py-0.5 rounded-sm">
+              <span className="bg-sky-900/20 text-sky-300 text-xs font-bold px-2 py-0.5 rounded-sm">
                 By : {event.organizer}
               </span>
             </div>     
@@ -40,6 +45,10 @@ const EventCard = ({ events = [] }) => {
                 className="h-40 w-full object-cover transition-transform duration-300"
                 />
             </div>
+
+              <span className="bg-sky-900/20 text-sky-100 text-[10px] font-bold px-2 py-0.5 rounded-sm">
+                Posted By : {event.studentId.toUpperCase()}
+              </span>
           </div>
         );
       })}

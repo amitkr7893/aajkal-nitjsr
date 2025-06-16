@@ -58,10 +58,10 @@ export default function EventSlideshow({ events }) {
             >
 
               <div className='from-black content-end h-full to-transparent bg-gradient-to-tr p-6'>  
-              {/* <h3 className="text-3xl font-bold text-white mb-2" >{events[index].title}</h3>
+              <h3 className="text-3xl font-bold text-white mb-2" >{events[index].title}</h3>
               <p className= "bg-gradient-to-r text-white text-sm">{events[index].date} | {events[index].location}</p>
               <p className= "bg-gradient-to-r text-white text-sm mt-2 line-clamp-2">{events[index].description}</p>
-              <p className= "bg-gradient-to-r text-blue-300 text-sm mt-1">By: {events[index].organizer}</p> */}
+              <p className= "bg-gradient-to-r text-blue-300 text-sm mt-1">By: {events[index].organizer}</p>
               </div>
             </div>
           </motion.div>

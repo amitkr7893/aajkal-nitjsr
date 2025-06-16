@@ -1,52 +1,32 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-// const images = ['/p1.jpg', '/p2.jpg', '/p3.jpg', '/p4.jpg', '/p5.jpg', '/p6.jpg'];
-
-export default function ImageCarousel({ events }) {
+export default function LiveEventCarousel({ events }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex(prev => (prev + 1) % 6);
-    }, 5000);
+      setIndex(prev => (prev + 1) % events.length);
+    }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [events.length]);
 
-  const getStyle = (i) => {
-    const pos = (i - index + 6) % 6;
-
-    const positions = [
-    { translateX: '40%', scale: 1.3, z: 40, opacity: 0, }, // front
-    { translateX: '40%', scale: 1.2, z: 40, opacity: 1, },
-    { translateX: '15%', scale: 0.5, z: 30, opacity: 1 , },
-    { translateX: '10%', scale: 0.4, z: 20, opacity: 1 , },
-    { translateX: '5%', scale: 0.3, z: 10, opacity: 1, },
-    { translateX: '0%', scale: 0.2, z: 0, opacity: 1,},
-  ];
-
-  // Hide the image that just left the front
-  if (pos == 5) {
-    return {
-      translateX: '0%', // move far to left
-      scale: 0.2,
-      z: 0,
-      opacity: 0,
-      pointerEvents: 'none',
-      rotateY: '0deg',
-    };
+  if (!events || events.length === 0) {
+    return (
+      <div className="text-center text-gray-400 py-8">
+        No live events right now.
+      </div>
+    );
   }
-    return positions[pos];
-  };
+
+  const currentEvent = events[index];
+    if (!currentEvent) return null;
 
   return (
-
-
-
-
-    <div className="relative h-[80vh] w-full flex justify-center items-center overflow-hidden">
+    <div className="relative h-[80vh] w-full flex justify-end items-center overflow-hidden">
 
 
 
@@ -76,38 +56,25 @@ export default function ImageCarousel({ events }) {
           </span>
       </div>
 
+        <div className='relative mr-8 w-full h-[560px] max-w-2xl flex rounded-2xl overflow-hidde items-center'>
 
-      <div className="relative w-full h-[360px] max-w-4/12 flex justify-center items-center">
-        {[...Array(6)].map((_, i) => {
-          const { translateX, scale, opacity, z, pointerEvents} = getStyle(i+1);
-          const src = events[i]?.image || '/event_img.jpg';
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-full h-full transition-all duration-500 ease-in-out shadow-xl"
-              style={{
-                transformOrigin: 'left 120px',
-                transform: `translateX(${translateX}) scale(${scale})`,
-                zIndex: z,
-                opacity,
-                pointerEvents,
-                backfaceVisibility: 'hidden',
-
-              }}
+          <motion.div
+            key={index}
+            className="absolute w-full h-full"
+            initial={{ opacity: 0, }}
+            animate={{ opacity: 1, }}
+            exit={{ opacity: 0, }}
+            transition={{ duration: 0.8 }}
             >
-              <Image
-                src={src}
-                alt={`carousel-${i}`}
-                layout="fill"
-                objectFit="fill"
-                className="rounded-2xl "
+            <Image
+              src={events[index].image || '/event_img.jpg'}
+              alt="Live Event"
+              layout="fill"
+              objectFit="fill"
+              className="brightness-60 border-2 border-red-400 rounded-2xl"
               />
-            </motion.div>
-          );
-        })}
-      </div>
-
-
+          </motion.div>
+        </div>
     </div>
   );
 }
