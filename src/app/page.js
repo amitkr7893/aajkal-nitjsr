@@ -7,7 +7,7 @@ import EventCard from "./components/EventCard";
 import LiveEventCarousel from "./components/LiveEventCarousel";
 
 const categories = [
-  "Home",
+  "All",
   "Cultural",
   "Technical",
   "Sports",
@@ -24,7 +24,7 @@ function getCookie(name) {
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("Home");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [studentId, setStudentId] = useState("");
   const [name, setName] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (activeCategory === "Home") {
+    if (activeCategory === "All") {
       setFilteredEvents(events);
     } else {
       setFilteredEvents(events.filter((e) => e.category === activeCategory));
@@ -129,26 +129,29 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="wrapper flex justify-center ">
+    <div className="min-h-screen bg-black w-[1480px]">
       {/* Header */}
       <header
-        className="flex items-center sticky top-0 justify-evenly z-50 p-4 bg-black shadow-md"
+        className="flex items-center sticky justify-between top-0 z-50 p-4 bg-black shadow-md"
         style={{ zIndex: "1000" }}
       >
         <div className="flex items-center space-x-3">
           <img
             src="/aajkal.png"
             alt="logo"
-            className="h-12 w-12 rounded-full bg-sky-500"
+            className="h-8 w-8 rounded-full bg-sky-500 sm:h-12 sm:w-12"
+            // className="h-12 w-12 rounded-full bg-sky-500"
           />
-          <h1 className="text-2xl font-bold text-white-700">aajkal@nitjsr</h1>
+          <h1 className="text-1xl font-bold text-white-700 sm:text-2xl">aajkal@nitjsr</h1>
+          {/* <h1 className="text-2xl font-bold text-white-700">aajkal@nitjsr</h1> */}
         </div>
-        <nav className="flex space-x-4">
+        <nav className="hidden lg:flex space-x-4">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium cursor-pointer ${
+              className={`px-3 py-1 rounded-full text-sm font-medium cursor-pointer ${
                 activeCategory === cat
                   ? "bg-sky-500 text-white"
                   : "text-white-700 hover:bg-sky-700"
@@ -162,7 +165,8 @@ export default function Home() {
           {studentId && (
             <Link
               href="/submit"
-              className="text-white-500 mr-4 border-2 px-4 py-1 rounded-full font-medium hover:opacity-80"
+              className="text-white-500 mr-4 border-1 px-4 py-1 text-xs  rounded-full font-medium hover:opacity-80 sm:text-[1rem]"
+              // className="text-white-500 mr-4 border-2 px-4 py-1 rounded-full font-medium hover:opacity-80"
             >
               Add Event
             </Link>
@@ -176,13 +180,15 @@ export default function Home() {
               <img
                 src="/user.png"
                 alt="Profile"
-                className="h-9 w-9 p-0.5 rounded-full border-2"
+                className="h-6 w-6 p-0.5 rounded-full border-1 sm:h-9 sm:w-9 sm:border-2"
+                // className="h-9 w-9 p-0.5 rounded-full border-2"
               />
             </div>
           ) : (
             <Link
               href="/login"
-              className="bg-sky-500 text-white-500 mr-4 border-1 border-sky-500 hover:scale-105 px-4 py-1 rounded-full font-medium "
+              className="bg-sky-500 text-white-500 mr-2 border-1 border-sky-500 hover:scale-105 px-4 py-1 rounded-full text-xs sm:text-[1rem]"
+              // className="bg-sky-500 text-white-500 mr-4 border-1 border-sky-500 hover:scale-105 px-4 py-1 rounded-full font-medium "
             >
               SignUp/LogIn
             </Link>
@@ -209,7 +215,7 @@ export default function Home() {
           )}
         </div>
       </header>
-      <main className="max-w-8xl mx-auto px-10 h-full flex gap-6">
+      <main className="max-w-8xl mx-auto px-4 sm:px-10 h-full flex flex-col gap-6 lg:flex-row">
         <div className="flex-2/4">
           <div className="flex justify-center gap-2 mb-2">
 
@@ -247,7 +253,27 @@ export default function Home() {
           )}
         </div>
 
-        <section className="relative w-[340px] rounded-2xl bg-zinc-950 h-[620px] ">
+        <div className="flex justify-center">
+        <section className="relative max-w-[340px] rounded-2xl bg-zinc-950 h-[620px] ">
+
+          {/* to select */}
+          <div className="block lg:hidden w-full">
+            {/* <label className="block text-white text-sm font-medium mb-1"> */}
+              {/* Select Category */}
+            {/* </label> */}
+            <select
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              className="w-full lg:w-auto px-4 py-2 rounded-md bg-zinc-800 text-white border border-zinc-700 focus:outline-none"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[600px] z-20 bg-[linear-gradient(to_top,black_0%,transparent_50%)]" />
           <div className="rounded-xs min-h-full h-[600px] z-10 overflow-auto custom-scrollbar">
             <h2 className="text-xl sticky top-0 bg-zinc-950 text-center font-bold text-white mb-2 p-4 rounded-2xl">
@@ -272,7 +298,9 @@ export default function Home() {
             )}
           </div>
         </section>
+        </div>
       </main>
+    </div>
     </div>
   );
 }
