@@ -1,5 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic';
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
@@ -15,7 +15,7 @@ function getCookie(name) {
   return null;
 }
 
-export default function Submit() {
+function SubmitInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const eventId = searchParams.get("id"); // Detect edit mode
@@ -284,5 +284,13 @@ export default function Submit() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function Submit() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SubmitInner />
+    </Suspense>
   );
 }
