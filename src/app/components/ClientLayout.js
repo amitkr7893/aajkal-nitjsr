@@ -12,10 +12,11 @@ export default function ClientLayout({ children }) {
     NProgress.start();
     const timer = setTimeout(() => {
       NProgress.done();
-    }, 300); // simulate short delay
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [pathname]);
 
   return <>{children}</>;
 }
+

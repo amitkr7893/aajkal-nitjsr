@@ -2,6 +2,9 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import NProgress from "nprogress";
+import CustomDialog from "../components/CustomDialog";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -19,7 +22,12 @@ export default function Dashboard() {
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  // Handle outside click
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [confirmDialog, setConfirmDialog] = useState({ show: false, id: null });
+
+  const showError = (msg) => setDialogMessage(msg);
+
+  // Handle outside click for dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -32,8 +40,8 @@ export default function Dashboard() {
       }
     }
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -45,6 +53,7 @@ export default function Dashboard() {
     }, 100);
   };
 
+  // Check auth
   useEffect(() => {
     const name = getCookie("name");
     const id = getCookie("studentId");
@@ -55,43 +64,64 @@ export default function Dashboard() {
     setStudentId(id);
     setStudentName(decodeURIComponent(name));
     setLoading(false);
-  }, []);
+  }, [router]);
 
+  // Fetch events from cache
   useEffect(() => {
     const fetchEvents = async () => {
       if (!studentId) return;
       try {
+        NProgress.start();
         const res = await fetch("/api/events");
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed to fetch events");
         const data = await res.json();
-        setEvents(data.filter((e) => e.studentId === studentId).sort((a, b) => new Date(b.date) - new Date(a.date)));
+        setEvents(
+          data
+            .filter((e) => e.studentId === studentId)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+        );
       } catch (err) {
-        console.error(err);
+        showError("Failed to load your events. Please try again.");
+      } finally {
+        NProgress.done();
       }
     };
     fetchEvents();
   }, [studentId]);
 
-  const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this event?");
-    if (!confirmed) return;
+  // Delete event
+  const handleDeleteConfirmed = async (id) => {
     try {
-      const res = await fetch(`/api/events?id=${id}`, {
-        method: "DELETE",
-      });
+      NProgress.start();
+      const res = await fetch(`/api/events?id=${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
       setEvents(events.filter((event) => event._id !== id));
     } catch (err) {
-      alert("Failed to delete. Try again.");
-      console.error(err);
+      showError("Failed to delete event. Try again.");
+    } finally {
+      NProgress.done();
     }
   };
 
   if (loading) return null;
 
-
   return (
     <div className="max-w-4xl mx-auto px-4 pt-2 pb-10">
+      {/* Error Dialog */}
+      <CustomDialog message={dialogMessage} onClose={() => setDialogMessage("")} />
+
+      {/* Confirm Dialog */}
+      {confirmDialog.show && (
+        <ConfirmDialog
+          message="Are you sure you want to delete this event?"
+          onConfirm={() => {
+            handleDeleteConfirmed(confirmDialog.id);
+            setConfirmDialog({ show: false, id: null });
+          }}
+          onCancel={() => setConfirmDialog({ show: false, id: null })}
+        />
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center bg-black text-white rounded-md p-3 sticky top-0 z-50 shadow-md">
         <Link href="/" className="font-medium hover:underline">
@@ -114,8 +144,13 @@ export default function Dashboard() {
           />
           {menuOpen && (
             <div className="absolute right-6 top-14 w-44 bg-white border border-gray-200 rounded-md shadow-md z-50 ">
-              <span className="block px-4 py-2 text-sm font-semibold border-b text-gray-800">{studentName}</span>
-              <Link href="/" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <span className="block px-4 py-2 text-sm font-semibold border-b text-gray-800">
+                {studentName}
+              </span>
+              <Link
+                href="/"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
                 Home
               </Link>
               <button
@@ -131,7 +166,9 @@ export default function Dashboard() {
 
       {/* Events List */}
       {events.length === 0 ? (
-        <p className="text-gray-400 text-center mt-16">You haven’t posted any events yet.</p>
+        <p className="text-gray-400 text-center mt-16">
+          You haven’t posted any events yet.
+        </p>
       ) : (
         <div className="space-y-6 mt-6">
           {events.map((event) => {
@@ -145,14 +182,14 @@ export default function Dashboard() {
               hour: "2-digit",
               minute: "2-digit",
             });
-              
-
             const isPast = new Date(event.endDate) < new Date();
 
             return (
               <div
                 key={event._id}
-                className={`bg-zinc-950 p-4 rounded-xl shadow-lg flex flex-col sm:flex-row gap-4 ${isPast ? 'grayscale opacity-80' : ''}`}
+                className={`bg-zinc-950 p-4 rounded-xl shadow-lg flex flex-col sm:flex-row gap-4 ${
+                  isPast ? "grayscale opacity-80" : ""
+                }`}
               >
                 <div className="sm:w-32 w-full h-32 overflow-hidden rounded-lg border border-zinc-700">
                   <img
@@ -164,12 +201,22 @@ export default function Dashboard() {
 
                 <div className="flex flex-col justify-center w-full">
                   <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">{event.title}</h3>
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      {event.title}
+                    </h3>
                     <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-medium">
-                      <span className="bg-pink-900/20 text-pink-300 px-2 py-0.5 rounded">{dateStr}</span>
-                      <span className="bg-yellow-900/20 text-yellow-300 px-2 py-0.5 rounded">{timeStr}</span>
-                      <span className="bg-green-900/20 text-green-300 px-2 py-0.5 rounded">{event.location}</span>
-                      <span className="bg-sky-900/20 text-sky-300 px-2 py-0.5 rounded">By: {event.organizer}</span>
+                      <span className="bg-pink-900/20 text-pink-300 px-2 py-0.5 rounded">
+                        {dateStr}
+                      </span>
+                      <span className="bg-yellow-900/20 text-yellow-300 px-2 py-0.5 rounded">
+                        {timeStr}
+                      </span>
+                      <span className="bg-green-900/20 text-green-300 px-2 py-0.5 rounded">
+                        {event.location}
+                      </span>
+                      <span className="bg-sky-900/20 text-sky-300 px-2 py-0.5 rounded">
+                        By: {event.organizer}
+                      </span>
                     </div>
                   </div>
 
@@ -177,7 +224,7 @@ export default function Dashboard() {
                     <button
                       onClick={() => {
                         sessionStorage.setItem("editingEvent", JSON.stringify(event));
-                        window.location.href = `/submit?id=${event._id}`;
+                        router.push(`/submit?id=${event._id}`);
                       }}
                       className="bg-sky-600 text-white text-md rounded px-2 py-1 items-center flex gap-1 hover:opacity-90"
                     >
@@ -185,7 +232,7 @@ export default function Dashboard() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(event._id)}
+                      onClick={() => setConfirmDialog({ show: true, id: event._id })}
                       className="bg-red-600 text-white text-md rounded px-2 py-1 items-center flex gap-1 hover:opacity-90"
                     >
                       <img src="/bin.png" className="h-4 w-4" alt="Delete" />

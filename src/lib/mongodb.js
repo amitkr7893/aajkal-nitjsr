@@ -1,4 +1,3 @@
-// here is lib/mongodb.js
 import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
@@ -7,10 +6,12 @@ const options = {};
 let client;
 let clientPromise;
 
+//for safety 
 if (!process.env.MONGODB_URI) {
   throw new Error("Please add your Mongo URI to .env.local");
 }
 
+//for only dev purpose
 if (process.env.NODE_ENV === "development") {
   if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
@@ -22,8 +23,7 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
-// 👇👇 ADD THIS FUNCTION 👇👇
 export async function connectToDatabase() {
   const client = await clientPromise;
-  return client.db(); // This gives you the DB from URI
+  return client.db(); // This gives the DB from URI
 }

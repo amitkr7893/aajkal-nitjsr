@@ -1,31 +1,15 @@
-// “Here is src/app/api/verify-otp/route.js ⬇️”
-import { connectToDatabase } from "@/lib/mongodb";
+import { verifyOtp } from "@/lib/otpStore";
 
 export async function POST(req) {
   try {
     const { studentId, otp } = await req.json();
-    const email = `${studentId.toLowerCase()}@nitjsr.ac.in`;
+    const email = `${studentId.toLowerCase().trim()}@nitjsr.ac.in`;
 
-    const db = await connectToDatabase();
-
-    const record = await db.collection('otp').findOne({ email: email });
-
-    if (!record) {
-      return new Response(JSON.stringify({ success: false, error: 'OTP not found or expired' }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
+    //Verify OTP
+    const isOtpValid = await verifyOtp(email, otp);
+    if (!isOtpValid) {
+      return NextResponse.json({ error: "Invalid or expired OTP" }, { status: 401 });
     }
-
-    if (record.otp !== otp) {
-      return new Response(JSON.stringify({ success: false, error: 'Invalid OTP' }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // Delete the OTP after successful verification
-    // await db.collection('otp').deleteOne({ email: email });
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

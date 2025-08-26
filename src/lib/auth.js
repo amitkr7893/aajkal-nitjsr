@@ -1,4 +1,3 @@
-// lib/auth file
 import { connectToDatabase } from "./mongodb";
 import bcrypt from "bcrypt";
 
@@ -19,12 +18,12 @@ export async function loginUser(studentId, password) {
   const db = await connectToDatabase();
   const user = await db.collection("users").findOne({ studentId });
 
-  if (!user || !user.pass) return null; // User not found or password missing
+  if (!user) return null;
 
   const isMatch = await bcrypt.compare(password, user.pass);
-  if (!isMatch) return null; // Password incorrect
+  if (!isMatch) return null;
 
-  return user; // ✅ Return the user if login successful
+  return user;
 }
 
 export async function updatePassword(studentId, newPassword) {

@@ -12,13 +12,13 @@ export async function POST(request) {
   pass = pass.trim();
   otp = otp.trim();
 
-  // 1. Check if user already exists
-  const existing = await findUserById(studentId);
-  if (existing) {
-    return NextResponse.json({ error: "User already exists" }, { status: 400 });
-  }
+  // 0. Check if user already exists
+  // const existing = await findUserById(studentId);
+  // if (existing) {
+  //   return NextResponse.json({ error: "User already exists" }, { status: 400 });
+  // }
 
-  // 2. Verify OTP
+  // 1. Verify OTP
   const isOtpValid = await verifyOtp(email, otp);
 
 
@@ -26,7 +26,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Invalid or expired OTP" }, { status: 401 });
   }
 
-  // 4. Create the user after OTP verification
+  // 2. Create the user after OTP verification
   await createUser({ studentId, name, pass, email });
 
   const res = NextResponse.json({ message: "Registered successfully" });

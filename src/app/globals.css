@@ -57,7 +57,17 @@ body {
   scrollbar-color: #252525 #000000;
 }
 
-.opt:hover {
-  background-color: #f59e0b; /* amber-500 */
-  color: white;
+/* .opt:hover { */
+  /* background-color: #f59e0b; amber-500 */
+  /* color: white; */
+/* } */
+
+
+/* .test{
+  color: red;
 }
+@media (width >= 600px) {
+  .test{
+    color: blueviolet;
+  }
+} */
