@@ -1,5 +1,4 @@
 "use client";
-import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
@@ -15,7 +14,7 @@ function getCookie(name) {
   return null;
 }
 
-function SubmitInner() {
+export default function Submit() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const eventId = searchParams.get("id"); // Detect edit mode
@@ -284,13 +283,5 @@ function SubmitInner() {
         </form>
       </div>
     </div>
-  );
-}
-
-export default function Submit() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SubmitInner />
-    </Suspense>
   );
 }

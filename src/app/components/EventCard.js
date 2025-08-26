@@ -1,4 +1,4 @@
-// components/EventCard.js
+"use client";
 import React from 'react';
 
 const EventCard = ({ events = [] }) => {
