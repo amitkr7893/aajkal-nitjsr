@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ImageCarousel from "./components/ImageCarousel";
 import EventCard from "./components/EventCard";
 import LiveEventCarousel from "./components/LiveEventCarousel";
+import Footer from "./components/Footer";
 
 const categories = [
   "All",
@@ -128,8 +129,8 @@ export default function Home() {
 
 
   return (
-    <div className="wrapper flex justify-center ">
-      <div className="min-h-screen bg-black w-[1480px]">
+    // <div className="wrapper">
+      <div className="">
         {/* Header */}
         <header
           className="flex items-center sticky justify-between top-0 z-50 p-4 bg-black shadow-md"
@@ -216,9 +217,11 @@ export default function Home() {
             )}
           </div>
         </header>
-        <main className="max-w-8xl mx-auto px-4 sm:px-10 h-full flex flex-col gap-6 lg:flex-row">
-          <div className="flex-2/4">
-            <div className="flex justify-center gap-2 mb-2">
+
+        <main className="w-full max-w-[100%] px-4 sm:px-10 h-full flex flex-col gap-3 lg:flex-row mt-6 mb-0 pb-0">
+
+          <div className="flex-1 w-full ">
+            <div className="flex justify-center align-middle gap-2 mb-4">
               <button
                 onClick={() => setActiveTab("live")}
                 className={`px-4 py-1 rounded-sm ${
@@ -253,8 +256,8 @@ export default function Home() {
             )}
           </div>
 
-          <div className="flex justify-center">
-            <section className="relative max-w-[340px] rounded-2xl bg-zinc-950 h-[620px] ">
+          <div className="w-full self-center lg:w-[300px] my-4 pb-10 max-w-[540px]">
+            <section className="relative w-full rounded-2xl bg-zinc-950 h-[600px]">
               {/* to select */}
               <div className="block lg:hidden w-full">
                 {/* <label className="block text-white text-sm font-medium mb-1"> */}
@@ -273,9 +276,9 @@ export default function Home() {
                 </select>
               </div>
 
-              <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[600px] z-20 bg-[linear-gradient(to_top,black_0%,transparent_50%)]" />
+              <div className="pointer-events-none absolute -bottom-10 left-0 w-full h-[600px] z-20 bg-[linear-gradient(to_top,black_0%,transparent_50%)]" />
               <div className="rounded-xs min-h-full h-[600px] z-10 overflow-auto custom-scrollbar">
-                <h2 className="text-xl sticky top-0 bg-zinc-950 text-center font-bold text-white mb-2 p-4 rounded-2xl">
+                <h2 className="text-xl sticky top-0 bg-zinc-950 text-center font-bold text-sky-400 mb-2 p-4 rounded-2xl">
                   Upcoming Events -{" "}
                   {activeCategory === "Home" ? "All" : activeCategory}
                 </h2>
@@ -284,10 +287,12 @@ export default function Home() {
                     No upcoming events.
                   </p>
                 ) : (
-                  <EventCard events={upcomingEvents} />
+                  // <Link href={`/events/${event._id}`}>
+                    <EventCard events={upcomingEvents} />
+                  // </Link>
                 )}
 
-                <h2 className="text-xl sticky top-0 bg-zinc-950 text-center font-bold z-10 text-white mt-6 mb-2 p-4 rounded-2xl">
+                <h2 className="text-xl sticky top-0 bg-zinc-950 text-center font-bold z-10 text-yellow-400 mt-6 mb-2 p-4 rounded-2xl">
                   Past Events -{" "}
                   {activeCategory === "Home" ? "All" : activeCategory}
                 </h2>
@@ -299,8 +304,11 @@ export default function Home() {
               </div>
             </section>
           </div>
+
         </main>
+        
+        <Footer></Footer>
       </div>
-    </div>
+    // </div>
   );
 }

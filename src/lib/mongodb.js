@@ -18,7 +18,8 @@ if (process.env.NODE_ENV === "development") {
     global._mongoClientPromise = client.connect();
   }
   clientPromise = global._mongoClientPromise;
-} else {
+}
+else {  // actually runs in production
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
