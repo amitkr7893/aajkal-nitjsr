@@ -6,11 +6,24 @@ import NProgress from 'nprogress';
 import CustomDialog from '../components/CustomDialog';
 
 function getCookie(name) {
-  if (typeof document === 'undefined') return null; // SSR safety
+  if (typeof document === 'undefined') return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
+}
+
+// ⭐ Password validation (same as register page)
+function validatePassword(pass) {
+  const errors = [];
+
+  if (pass.length < 6) errors.push("Minimum 6 characters required");
+  if (!/[A-Z]/.test(pass)) errors.push("At least 1 uppercase letter required");
+  if (!/[a-z]/.test(pass)) errors.push("At least 1 lowercase letter required");
+  if (!/[0-9]/.test(pass)) errors.push("At least 1 number required");
+  if (!/[!@#$%]/.test(pass)) errors.push("At least 1 special character (! @ # $ %) required");
+
+  return errors;
 }
 
 export default function ForgotPasswordPage() {
@@ -22,28 +35,30 @@ export default function ForgotPasswordPage() {
   const [dialogMessage, setDialogMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [passErrors, setPassErrors] = useState([]); // ⭐ added for validation
   const router = useRouter();
 
   const showError = (msg) => setDialogMessage(msg);
 
-  // Redirect if user is already logged in
+  // Redirect logged-in users
   useEffect(() => {
     const id = getCookie('studentId');
-    if (id) {
-      router.replace('/');
-    }
+    if (id) router.replace('/');
   }, [router]);
 
-  // Timer countdown
+  // OTP resend countdown
   useEffect(() => {
     let interval;
     if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     }
     return () => clearInterval(interval);
   }, [timer]);
+
+  // ⭐ Update password validation live
+  useEffect(() => {
+    setPassErrors(validatePassword(newPassword));
+  }, [newPassword]);
 
   const sendOTP = async () => {
     setLoading(true);
@@ -69,6 +84,11 @@ export default function ForgotPasswordPage() {
   };
 
   const handleResetPassword = async () => {
+    if (passErrors.length > 0) {
+      showError("Fix password errors before resetting.");
+      return;
+    }
+
     setLoading(true);
     NProgress.start();
     try {
@@ -79,11 +99,10 @@ export default function ForgotPasswordPage() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
         showError('Password updated successfully!');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1500);
+        setTimeout(() => router.push('/login'), 1500);
       } else {
         showError(data.error || 'Failed to reset password.');
       }
@@ -111,11 +130,12 @@ export default function ForgotPasswordPage() {
           onChange={(e) => setStudentId(e.target.value)}
         />
 
+        {/* SEND OTP BUTTON */}
         {!otpSent ? (
           <button
             onClick={sendOTP}
             disabled={!studentId}
-            className="w-full bg-emerald-500 text-white py-2 rounded disabled:hover:cursor-default disabled:text-neutral-400 disabled:bg-emerald-800 hover:bg-emerald-600 cursor-pointer"
+            className="w-full bg-emerald-500 text-white py-2 rounded disabled:bg-emerald-800 disabled:text-neutral-400 hover:bg-emerald-600 cursor-pointer"
           >
             Send OTP
           </button>
@@ -128,7 +148,8 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setOtp(e.target.value)}
             />
 
-            <div className="relative mb-4 w-full">
+            {/* PASSWORD INPUT */}
+            <div className="relative mb-2 w-full">
               <input
                 className="w-full p-2 pr-10 border rounded"
                 type={visible ? 'text' : 'password'}
@@ -146,17 +167,29 @@ export default function ForgotPasswordPage() {
               </button>
             </div>
 
+            {/* ⭐ Password errors */}
+            {newPassword && passErrors.length > 0 && (
+              <ul className="text-xs text-red-400 mb-3 space-y-1">
+                {passErrors.map((err, i) => (
+                  <li key={i}>• {err}</li>
+                ))}
+              </ul>
+            )}
+
+            {/* RESET PASSWORD BUTTON */}
             <button
-              disabled={!otp || !newPassword}
+              disabled={!otp || !newPassword || passErrors.length > 0}
               onClick={handleResetPassword}
-              className="w-full bg-sky-500 text-white py-2 rounded disabled:hover:cursor-default disabled:bg-sky-800 disabled:text-neutral-400 hover:bg-sky-600 cursor-pointer"
+              className="w-full bg-sky-500 text-white py-2 rounded disabled:bg-sky-800 disabled:text-neutral-400 hover:bg-sky-600 cursor-pointer"
             >
               Reset Password
             </button>
 
+            {/* TIMER & RESEND */}
             {timer > 0 ? (
               <p className="text-sm text-gray-400 text-center mt-2">
-                Resend OTP in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+                Resend OTP in {Math.floor(timer / 60)}:
+                {String(timer % 60).padStart(2, '0')}
               </p>
             ) : (
               <button

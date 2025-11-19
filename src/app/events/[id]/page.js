@@ -20,16 +20,17 @@ export default function EventDetails({ params }) {
 
   const dt = new Date(event.date);
   const time = dt.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <div className="min-h-screen bg-black text-white py-8 px-4 md:px-10">
       <div className="max-w-6xl mx-auto bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 md:p-10">
-        {/* Responsive Layout */}
+
         <div className="flex flex-col md:flex-row gap-8 items-start">
-          {/* Left Side (Sticky Image) */}
+          
+          {/* Left Side Image */}
           <div className="w-full md:w-1/2 md:sticky md:top-18 self-start rounded-xl overflow-hidden border border-zinc-700 shadow-lg">
             <Image
               src={image || "/event_img.jpg"}
@@ -40,12 +41,10 @@ export default function EventDetails({ params }) {
             />
           </div>
 
-          {/* Right Side (Content) */}
+          {/* Right Side */}
           <div className="w-full md:w-1/2">
-            {/* Title */}
             <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
 
-            {/* Meta Info */}
             <div className="flex flex-wrap gap-2 mb-6">
               <span className="bg-pink-900/20 text-pink-300 text-sm font-medium px-3 py-1 rounded-md">
                 {new Date(date).toLocaleDateString("en-GB")}
@@ -61,14 +60,16 @@ export default function EventDetails({ params }) {
               </span>
             </div>
 
-            {/* Description */}
+            {/* Description (UPDATED PART) */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 md:p-5 shadow-inner mb-8">
               <h2 className="text-xl font-semibold mb-2 text-sky-300">
                 About the Event
               </h2>
-              <p className="text-gray-300 leading-relaxed whitespace-pre-line text-sm md:text-base">
-                {desc || "No description available."}
-              </p>
+
+              <div
+                className="text-gray-300 leading-relaxed whitespace-pre-wrap text-sm md:text-base"
+                dangerouslySetInnerHTML={{ __html: desc }}
+              />
             </div>
 
             {/* Posted By */}
@@ -88,6 +89,7 @@ export default function EventDetails({ params }) {
                 ← Back to Events
               </Link>
             </div>
+
           </div>
         </div>
       </div>

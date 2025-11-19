@@ -6,11 +6,24 @@ import NProgress from "nprogress";
 import CustomDialog from "../components/CustomDialog";
 
 function getCookie(name) {
-  if (typeof document === "undefined") return null; // SSR safety check
+  if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
   return null;
+}
+
+// ✅ Password validation function
+function validatePassword(pass) {
+  const errors = [];
+
+  if (pass.length < 6) errors.push("Minimum 6 characters required");
+  if (!/[A-Z]/.test(pass)) errors.push("At least 1 uppercase letter required");
+  if (!/[a-z]/.test(pass)) errors.push("At least 1 lowercase letter required");
+  if (!/[0-9]/.test(pass)) errors.push("At least 1 number required");
+  if (!/[!@#$%]/.test(pass)) errors.push("At least 1 special character (! @ # $ %) required");
+
+  return errors;
 }
 
 export default function Register() {
@@ -23,17 +36,16 @@ export default function Register() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [passErrors, setPassErrors] = useState([]); // ⭐ password errors
   const router = useRouter();
 
   const [dialogMessage, setDialogMessage] = useState("");
   const showError = (msg) => setDialogMessage(msg);
 
   useEffect(() => {
-      const id = getCookie("studentId");
-      if (id) {
-        router.replace("/");
-      }
-    }, [router]);
+    const id = getCookie("studentId");
+    if (id) router.replace("/");
+  }, [router]);
 
   useEffect(() => {
     let interval;
@@ -45,7 +57,17 @@ export default function Register() {
     return () => clearInterval(interval);
   }, [timer]);
 
+  // ⭐ Check password live
+  useEffect(() => {
+    setPassErrors(validatePassword(pass));
+  }, [pass]);
+
   const sendOTP = async () => {
+    if (passErrors.length > 0) {
+      showError("Please create a stronger password before sending OTP.");
+      return;
+    }
+
     setLoading(true);
     NProgress.start();
     try {
@@ -54,6 +76,7 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId }),
       });
+
       if (res.ok) {
         setOtpSent(true);
         setTimer(120);
@@ -76,6 +99,7 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId, otp }),
       });
+
       if (res.ok) {
         setOtpVerified(true);
       } else {
@@ -88,6 +112,12 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (passErrors.length > 0) {
+      showError("Please fix the password requirements.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/register", {
@@ -95,8 +125,9 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId, name, pass, otp }),
       });
+
       if (res.ok) {
-        showError(`${name}, you are registered successfully !`);
+        showError(`${name}, you are registered successfully!`);
         router.push("/login");
       } else {
         const data = await res.json();
@@ -113,16 +144,14 @@ export default function Register() {
         <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50"></div>
       )}
 
-      <CustomDialog
-        message={dialogMessage}
-        onClose={() => setDialogMessage("")}
-      />
+      <CustomDialog message={dialogMessage} onClose={() => setDialogMessage("")} />
 
       <form
         onSubmit={handleSubmit}
         className="max-w-md mx-auto mt-10 space-y-4 p-6 bg-zinc-950 shadow rounded"
       >
         <h2 className="text-2xl font-bold text-center">Register</h2>
+
         <input
           className="w-full p-2 border rounded"
           value={studentId}
@@ -130,6 +159,7 @@ export default function Register() {
           placeholder="Registration No"
           required
         />
+
         <input
           className="w-full p-2 border rounded"
           value={name}
@@ -137,6 +167,8 @@ export default function Register() {
           placeholder="Full Name"
           required
         />
+
+        {/* Password Input */}
         <div className="relative w-full">
           <input
             className="w-full p-2 pr-10 border rounded"
@@ -155,12 +187,21 @@ export default function Register() {
           </button>
         </div>
 
+        {/* ⭐ Password error messages */}
+        {pass && passErrors.length > 0 && (
+          <ul className="text-xs text-red-400 space-y-1">
+            {passErrors.map((err, i) => (
+              <li key={i}>• {err}</li>
+            ))}
+          </ul>
+        )}
+
         {/* OTP Section */}
         {!otpSent && (
           <button
             type="button"
-            disabled={!studentId || !name || !pass}
-            className="w-full p-2 bg-emerald-500 text-white rounded disabled:hover:cursor-default disabled:bg-emerald-800 disabled:text-neutral-400 hover:bg-emerald-600 cursor-pointer"
+            disabled={!studentId || !name || !pass || passErrors.length > 0}
+            className="w-full p-2 bg-emerald-500 text-white rounded disabled:bg-emerald-800 disabled:text-neutral-400 hover:bg-emerald-600 cursor-pointer"
             onClick={sendOTP}
           >
             Send OTP
@@ -177,18 +218,16 @@ export default function Register() {
               required
             />
 
-            {/* Verify OTP Button */}
-            {otp && !otpVerified &&(
+            {!otpVerified && otp && (
               <button
                 type="button"
                 onClick={verifyOTP}
-                className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-800 disabled:text-neutral-400 disabled:hover:cursor-default"
+                className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer"
               >
                 Verify OTP
               </button>
             )}
 
-            {/* Resend OTP Button with Timer */}
             {timer > 0 ? (
               <p className="text-sm text-gray-400 text-center">
                 Resend OTP in {Math.floor(timer / 60)}:
@@ -208,8 +247,8 @@ export default function Register() {
 
         <button
           type="submit"
-          disabled={!otpVerified}
-          className="w-full p-2 bg-sky-500 text-white rounded disabled:bg-sky-800 disabled:text-neutral-400 disabled:hover:cursor-default  hover:bg-sky-600 cursor-pointer"
+          disabled={!otpVerified || passErrors.length > 0}
+          className="w-full p-2 bg-sky-500 text-white rounded disabled:bg-sky-800 disabled:text-neutral-400 hover:bg-sky-600 cursor-pointer"
         >
           Register
         </button>

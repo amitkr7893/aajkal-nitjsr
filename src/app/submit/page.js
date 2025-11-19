@@ -15,6 +15,17 @@ function getCookie(name) {
   return null;
 }
 
+// Convert URLs to clickable HTML before storing
+function convertLinks(text) {
+  if (!text) return text;
+
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" class="text-sky-400 underline break-all">${url}</a>`;
+  });
+}
+
 function SubmitInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -118,9 +129,10 @@ function SubmitInner() {
 
       const payload = {
         ...form,
+        desc: convertLinks(form.desc), 
         image: imageUrl,
         studentId,
-        id: eventId,
+        id:eventId,
       };
 
       const res = await fetch("/api/events", {

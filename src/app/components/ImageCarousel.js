@@ -84,6 +84,8 @@ export default function ImageCarousel({ events = [] }) {
     <div className="relative w-full flex justify-center items-center overflow-hidden p-16">
       {/* Left Text Info */}
       <div className="absolute z-50 h-full left-0 flex-grow pt-8 pl-8 flex flex-col justify-items-start">
+        <div className="hidden md:block">
+
         <h3 className="hidden md:block text-6xl mb-10 font-bold text-shadow-lg">
           {currentEvent?.title || "Event Title"}
         </h3>
@@ -92,19 +94,19 @@ export default function ImageCarousel({ events = [] }) {
           <span className="bg-pink-900/20 m-1 w-max text-pink-300 text-xs font-medium px-2 py-0.5 rounded-sm">
             {currentEvent?.date
               ? new Date(currentEvent.date).toLocaleString("en-GB", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
               : "00/00/0000"}
           </span>
           <span className="bg-yellow-900/20 m-1 w-max text-yellow-300 text-xs font-medium px-2 py-0.5 rounded-sm">
             {currentEvent?.date
               ? new Date(currentEvent.date).toLocaleString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                })
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
               : "00:00 XY"}
           </span>
         </span>
@@ -118,15 +120,14 @@ export default function ImageCarousel({ events = [] }) {
           By : {currentEvent?.organizer || "Team XYZ"}
         </span>
 
-        <span className="hidden md:block bg-grey-900/20 m-1 mt-12 max-h-20 max-w-[20vw] text-gray-400 text-sm px-2 py-0.5 rounded-sm indent-6 line-clamp-3">
-          {currentEvent?.description ||
-            currentEvent?.desc ||
-            "Join the brightest minds in AI and technology for a day filled with expert talks, hands-on workshops, and networking opportunities."}
-        </span>
+        <span className="bg-grey-900/20 m-1 mt-12 max-w-[20vw] text-gray-400 text-sm px-2 py-0.5 rounded-sm indent-6 line-clamp-5">
+            {events[index]?.desc || 'Join the brightest minds in AI and technology for a day filled with expert talks, hands-on workshops, and networking opportunities. Discover how artificial intelligence is transforming industries and shaping the future.' }
+          </span>
+        </div>
       </div>
 
       {/* Image Carousel */}
-      <div className="relative w-[200px] h-[200px] sm:w-[310px] sm:h-[310px] lg:w-[360px] lg:h-[360px] flex justify-center items-center">
+      <div className="relative md:pl-40 lg:pl-0 w-[200px] h-[200px] sm:w-[310px] sm:h-[310px] lg:w-[360px] lg:h-[360px] flex justify-center items-center">
         {[...Array(6)].map((_, i) => {
           const { translateX, scale, opacity, z, pointerEvents } = getStyle(
             i + 1
